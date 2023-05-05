@@ -11,6 +11,35 @@ from django.conf import settings
 from apps.accounts.models import User
 
 
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(write_only=True)
+    confirm_password = serializers.CharField(write_only=True)
+
+    default_error_messages = {
+        "email_taken": _("This email address is already in use."),
+    }
+
+    class Meta:
+        model = User
+        fields = ("nip", "email", "username", "password", "confirm_password")
+
+    def validate(self, data):
+        if data["password"] != data["confirm_password"]:
+            raise serializers.ValidationError("password does not match")
+        return data
+
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError(self.error_messages["email_taken"])
+        return value
+
+    def create(self, validated_data):
+        validated_data.pop("confirm_password", None)
+        user = User.objects.create_user(**validated_data)
+        return user
+
+
 class UserLoginSerializer(TokenObtainPairSerializer):
     nip = serializers.CharField(required=True)
     password = serializers.CharField(required=True)
@@ -42,6 +71,7 @@ class UserLoginSerializer(TokenObtainPairSerializer):
         refresh = RefreshToken.for_user(self.user)
         life_time = int(refresh.access_token.lifetime.total_seconds())
         response = {
+            "id": self.user.id,
             "nip": self.user.nip,
             "email": self.user.email,
             "token": {
@@ -76,9 +106,10 @@ class UserRefreshTokenSerializer(TokenRefreshSerializer):
 
         self.user = User.objects.get(id=jwt_decode["user_id"])
         response_formated = {
+            "user": self.user.id,
             "token": {
                 "access": access_token,
                 "life_time": life_time,
-            }
+            },
         }
         return response_formated

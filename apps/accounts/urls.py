@@ -14,6 +14,11 @@ urlpatterns = [
                     name="auth-login",
                 ),
                 path(
+                    "register/",
+                    auth_views.UserRegistrationAPIView.as_view(),
+                    name="auth-register",
+                ),
+                path(
                     "refresh/",
                     auth_views.RefreshGenericAPIView.as_view(),
                     name="auth-refresh",

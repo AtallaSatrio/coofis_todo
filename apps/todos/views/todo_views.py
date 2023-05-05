@@ -27,7 +27,7 @@ class TodoDestroyAPIView(generics.DestroyAPIView):
 class TodoListCreateAPIView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = TodoSerializers
-    pagination_class = TodoPagination
+    # pagination_class = TodoPagination
 
     def create(self, request):
         user = request.user
@@ -37,13 +37,13 @@ class TodoListCreateAPIView(generics.ListCreateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def list(self, request):
-        limit = 10
+        # limit = 10
         data = self.get_queryset()
-        paginator = self.pagination_class(limit)
-        queryset = paginator.paginate_queryset(data, request)
-        serialzer = TodoSerializers(queryset, many=True)
-
-        return paginator.get_paginated_response(serialzer.data)
+        # paginator = self.pagination_class(limit)
+        # queryset = paginator.paginate_queryset(data, request)
+        serialzer = TodoSerializers(data, many=True)
+        return Response(serialzer.data, status=status.HTTP_200_OK)
+        # return paginator.get_paginated_response(serialzer.data)
 
     def get_queryset(self):
         user = self.request.user

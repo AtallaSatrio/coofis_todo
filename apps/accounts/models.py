@@ -18,6 +18,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         unique=True,
     )
     email = models.EmailField(verbose_name="Email", db_index=True)
+    username = models.CharField(
+        verbose_name="Username", max_length=225, default="username"
+    )
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     updated_at = models.DateTimeField(auto_now=True)

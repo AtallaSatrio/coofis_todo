@@ -3,9 +3,22 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from apps.accounts.serializers.auth_serializers import (
     UserLoginSerializer,
+    UserRegistrationSerializer,
     UserRefreshTokenSerializer,
 )
 from rest_framework.permissions import IsAuthenticated
+
+
+class UserRegistrationAPIView(generics.CreateAPIView):
+    """User Registration"""
+
+    serializer_class = UserRegistrationSerializer
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class LoginGenericAPIView(generics.GenericAPIView):

@@ -11,7 +11,9 @@ class CustomUserManager(BaseUserManager):
         except ValidationError:
             raise ValueError(_("You must provide a valid email address"))
 
-    def create_user(self, nip, email, password, is_staff=False, is_superuser=False):
+    def create_user(
+        self, nip, email, username, password, is_staff=False, is_superuser=False
+    ):
         if not nip:
             raise ValueError(_("User must submit a nip"))
         if email:
@@ -21,7 +23,11 @@ class CustomUserManager(BaseUserManager):
             raise ValueError(_("Base user account : an email address is required"))
 
         user = self.model(
-            nip=nip, email=email, is_staff=is_staff, is_superuser=is_superuser
+            nip=nip,
+            email=email,
+            username=username,
+            is_staff=is_staff,
+            is_superuser=is_superuser,
         )
 
         user.set_password(password)
